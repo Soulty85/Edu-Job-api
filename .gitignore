@@ -5,6 +5,9 @@ __pycache__/
 
 .vscode/
 
+# local test file
+*.http
+
 # C extensions
 *.so
 

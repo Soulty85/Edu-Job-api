@@ -1,13 +1,13 @@
 from django.db import models
 from django.utils import timezone
 
-from auth.models import User
+from authentication.models import User
 
 
 # Create your models here.
 class Candidate(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
-    phone = models.CharField(max_length=20, blank=True, blank=False, null=False)
+    phone = models.CharField(max_length=20, blank=True, null=False)
     address = models.TextField(blank=True)
     birth_date = models.DateField(blank=False, null=False)
     nationality = models.CharField(max_length=30, blank=False,null=False)
@@ -48,7 +48,7 @@ class Position(models.Model):
     department = models.ForeignKey(Department, on_delete=models.CASCADE)
     subjects = models.CharField(max_length=300)
     level = models.CharField(max_length=100)
-    hourly_volume=models.IntegerField(min=0, max=100)
+    hourly_volume=models.IntegerField()
     contract_type = models.CharField(max_length=20, choices=CONTRACT_TYPES)
     start_date = models.DateField()
     end_date = models.DateField(null=True)
