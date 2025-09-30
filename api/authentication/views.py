@@ -3,11 +3,12 @@ from rest_framework import status
 from rest_framework.generics import GenericAPIView
 from rest_framework.response import Response
 from rest_framework_simplejwt.tokens import RefreshToken
+from rest_framework_simplejwt.views import TokenObtainPairView
 
-from .serializers import CandidateRegisterSerializer, UserLoginSerializer
+from .serializers import CandidateRegisterSerializer, UserLoginSerializer, CustomTokenObtainPairSerializer
 from .models import User
 
-# Create your views here.
+
 class UserRegisterView(GenericAPIView):
     serializer_class = CandidateRegisterSerializer
     
@@ -37,8 +38,13 @@ class UserLoginView(GenericAPIView):
         user = serializer.validated_data['user']
         
         refresh = RefreshToken().for_user(user)
+        refresh['group'] = user.group 
         
         return Response({
             'access': str(refresh.access_token),
             'refresh': str(refresh),
         })
+
+
+class CustomTokenObtainPairView(TokenObtainPairView):
+    serializer_class = CustomTokenObtainPairSerializer

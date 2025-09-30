@@ -11,6 +11,7 @@ https://docs.djangoproject.com/en/5.2/ref/settings/
 """
 
 from pathlib import Path
+from datetime import timedelta
 # from dotenv import load_dotenv
 
 # import os
@@ -52,6 +53,8 @@ INSTALLED_APPS = [
     # applications
     'authentication',
     'candidates',    
+    'positions',    
+    'recruitment_process',    
 ]
 
 MIDDLEWARE = [
@@ -154,6 +157,10 @@ REST_FRAMEWORK = {
     ]
 }
 
+SIMPLE_JWT = {
+    "ACCESS_TOKEN_LIFETIME": timedelta(minutes=5, hours=2),
+    "REFRESH_TOKEN_LIFETIME": timedelta(days=1),
+}
 # authentication variables
 # EMAIL_BACKEND = "django.core.mail.backends.smtp.EmailBackend"
 # EMAIL_HOST = os.getenv("EMAIL_HOST")

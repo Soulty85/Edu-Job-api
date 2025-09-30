@@ -1,6 +1,8 @@
 from django.contrib.auth import authenticate
 from django.contrib.auth.password_validation import validate_password
 from rest_framework import serializers
+from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
+from rest_framework_simplejwt.tokens import AccessToken
 
 from .models import User
 from candidates.models import Candidate
@@ -32,6 +34,12 @@ class UserRegisterSerializer(serializers.ModelSerializer):
         )
         
         return user
+
+
+class UserSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = User
+        fields = ['id', 'username', 'first_name', 'last_name', 'email']
 
 
 class CandidateRegisterSerializer(serializers.ModelSerializer):
@@ -66,3 +74,18 @@ class UserLoginSerializer(serializers.ModelSerializer):
         attrs["user"] = user
         
         return attrs
+
+
+class CustomTokenObtainPairSerializer(TokenObtainPairSerializer):
+    @classmethod
+    def get_token(cls, user):
+        token = super().get_token(user)
+        
+        access = AccessToken.for_user(user)
+        access['full_name'] = user.get_full_name()
+        access['email'] = user.email
+        access['group'] = user.role
+        
+        token['access'] = str(access) 
+        
+        return token

@@ -3,62 +3,55 @@ from django.utils import timezone
 
 from authentication.models import User
 
+import os
 
-# Create your models here.
+
+def candidate_document_path(instance, filename):
+    return f"candidates/{instance.candidate.id}/{filename}"
+
+
 class Candidate(models.Model):
-    user = models.OneToOneField(User, on_delete=models.CASCADE)
-    phone = models.CharField(max_length=20, blank=True, null=False)
+    user = models.OneToOneField(User, on_delete=models.CASCADE, related_name='candidate_profile')
+    phone = models.CharField(max_length=20, blank=True)
     address = models.TextField(blank=True)
-    birth_date = models.DateField(blank=False, null=False)
-    nationality = models.CharField(max_length=30, blank=False,null=False)
-    # cv_url = models.CharField(max_length=255, blank=False, null=False)
-    # diploma_url = models.CharField(max_length=255, blank=False, null=False)
-    created_at = models.DateTimeField(auto_now_add=True)
-    updated_at = models.DateTimeField(auto_now=True)
+    nationality = models.CharField(max_length=100, blank=True)
+    birthdate = models.DateField(null=True, blank=True)
+    experience = models.TextField(blank=True, help_text="Expérience professionnelle")
+    specialties = models.TextField(blank=True, help_text="Spécialités et compétences")
+    
+    class Meta:
+        ordering = ['user__last_name', 'user__first_name']
     
     def __str__(self):
-        return f"{self.user.first_name} {self.user.last_name}"
+        return f"{self.user.get_full_name()}"
     
     def full_name(self):
-        return f"{self.user.first_name} {self.user.last_name}"
+        return self.user.get_full_name()
+    
+    def email(self):
+        return self.user.email
 
 
-class Department(models.Model):
+class DocumentType(models.Model):
     name = models.CharField(max_length=100)
+    is_required = models.BooleanField(default=False)
+    description = models.TextField(blank=True)
     
     def __str__(self):
         return self.name
 
 
-class Position(models.Model):
-    CONTRACT_TYPES = (
-        ('vacataire', 'Vacataire'),
-        ('permanent', 'Permanent'),
-    )
+class Document(models.Model):
+    candidate = models.ForeignKey(Candidate, on_delete=models.CASCADE, related_name='documents')
+    document_type = models.ForeignKey(DocumentType, on_delete=models.CASCADE, related_name='documents')
+    file = models.FileField(upload_to=candidate_document_path)
+    uploaded_at = models.DateTimeField(auto_now_add=True)
     
-    STATUS_CHOICES = (
-        ('ouverte', 'Ouverte'),
-        ('en_cours', 'En cours de sélection'),
-        ('pourvue', 'Pourvue'),
-        ('annulee', 'Annulée'),
-    )
-    
-    title = models.CharField(max_length=200)
-    description = models.TextField(blank=True)
-    department = models.ForeignKey(Department, on_delete=models.CASCADE)
-    subjects = models.CharField(max_length=300)
-    level = models.CharField(max_length=100)
-    hourly_volume=models.IntegerField()
-    contract_type = models.CharField(max_length=20, choices=CONTRACT_TYPES)
-    start_date = models.DateField()
-    end_date = models.DateField(null=True)
-    status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='ouverte')
-    created_by = models.ForeignKey(User, on_delete=models.CASCADE)
-    created_at = models.DateTimeField(auto_now_add=True)
-    updated_at = models.DateTimeField(auto_now=True)
+    class Meta:
+        ordering = ['-uploaded_at']
     
     def __str__(self):
-        return f"{self.title} - {self.department}"
+        return f"{self.candidate} - {self.document_type}"
     
-    def is_open(self):
-        return self.status == 'ouverte' and self.application_deadline >= timezone.now().date()
+    def filename(self):
+        return os.path.basename(self.file.name)

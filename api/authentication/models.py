@@ -8,12 +8,12 @@ class User(AbstractUser):
     ROLE_CHOICES = (
         ('RH', 'RH'),
         ('Direction','Direction'),
-        ('Chef de Département', 'Déartement'),
+        ('ChefDeDepartement', 'ChefDeDepartement'),
         ('Candidat', 'Candidat')
     )
     username = None
     email = models.EmailField("email address", unique=True)
-    role = models.CharField(max_length=20, choices=ROLE_CHOICES, default='Candidat',null=False, blank=False)
+    group = models.CharField(max_length=20, choices=ROLE_CHOICES, default='Candidat',null=False, blank=False)
     
     USERNAME_FIELD = "email"
     REQUIRED_FIELDS = []

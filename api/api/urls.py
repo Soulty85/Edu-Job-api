@@ -18,8 +18,14 @@ from django.contrib import admin
 from django.urls import path, include
 
 import authentication.urls
+import candidates.urls
+import positions.urls
+import recruitment_process.urls
 
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('api/auth/', include(authentication.urls)),
+    path('api/', include(candidates.urls)),
+    path('api/', include(positions.urls)),
+    path('api/', include(recruitment_process.urls)),
 ]
