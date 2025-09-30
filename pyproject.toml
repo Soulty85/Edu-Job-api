@@ -10,6 +10,7 @@ dependencies = [
     "djangorestframework>=3.16.1",
     "djangorestframework-simplejwt>=5.5.1",
     "dot>=0.3.0",
+    "drf-nested-routers>=0.95.0",
     "env>=0.1.0",
     "pyotp>=2.9.0",
 ]
